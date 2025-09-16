@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8585:8585"
+    depends_on:
+      - db
+      - redis
+      - grpc_server
+      - kafka
+    environment:
+      DB_PASSWORD: bezhan2009
+      ADMIN: bezhan
+      JWT_SECRET_KEY: c507f84b118b5f5a6ea8a6977a6937b4fdcc14b4ed2796c6d6ae7c9ad4a7370f
+      JWT_TTL_MINUTES: 60
+      JWT_TTL_HOURS: 72
+      SECRET_KEY: 0078bec8585ad8a0cd71907d455998103d689f5de55ddb4e8803bd6b7d94ba1a
+    entrypoint: /bin/sh -c "sleep 10 && ./main"
+    networks:
+      - Creditsnetwork
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: bezhan2009
+      POSTGRES_DB: biz_mart_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - Creditsnetwork
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - Creditsnetwork
+
+  grpc_server:
+    build:
+      context: ./SSO
+      dockerfile: Dockerfile
+    container_name: grpc_server
+    ports:
+      - "44044:44044"
+    networks:
+      - Creditsnetwork
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - Creditsnetwork
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - Creditsnetwork
+
+networks:
+  Creditsnetwork:
+    driver: bridge
+
+volumes:
+  pgdata:
