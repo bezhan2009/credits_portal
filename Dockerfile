@@ -1,46 +1,53 @@
-# Первый Dockerfile
+# ---------- BUILD STAGE ----------
 FROM golang:1.23.6 AS builder
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем go.mod и go.sum для установки зависимостей
+# Копируем go.mod и go.sum
 COPY go.mod go.sum ./
 
-# Загружаем зависимости
+# Скачиваем зависимости
 RUN go mod download
 
-# Копируем остальной код проекта
+# Копируем весь код
 COPY . .
 
-# Собираем бинарный файл
+# Устанавливаем swag
+RUN go install github.com/swaggo/swag/cmd/swag@v1.8.12
+
+# Генерируем swagger-документацию
+RUN swag init
+
+# Собираем бинарник
 RUN go build -o main main.go
 
-# Используем минимальный образ для запуска
+
+# ---------- RUNTIME STAGE ----------
 FROM ubuntu:latest
 
-# Устанавливаем необходимые зависимости
+WORKDIR /app
+
+# Устанавливаем зависимости
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем рабочую директорию
-WORKDIR /root/
+# Создаём директорию для конфигов
+RUN mkdir -p configs
 
-# Создаем директорию для хранения конфигов
-RUN mkdir "configs"
+# Создаём директорию для uploads
+RUN mkdir -p uploads
 
-# Копируем бинарный файл из стадии сборки
+# Копируем бинарник
 COPY --from=builder /app/main .
 
 # Копируем конфиги
-COPY --from=builder /app/configs/docker/configs.json ./configs
-COPY --from=builder /app/configs/docker/example.json ./configs
+COPY --from=builder /app/configs/docker/configs.json ./configs/
 
-# Копируем переменные окружения
+# Копируем .env
 COPY --from=builder /app/.env .
-COPY --from=builder /app/example.env .
 
-# Открываем порт
-EXPOSE 8585
+# Копируем docs
+COPY --from=builder /app/docs ./docs/
 
-# Команда для запуска
+EXPOSE 7777
+
 CMD ["./main"]
