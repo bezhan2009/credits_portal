@@ -13,9 +13,9 @@ type CreditsStatus struct {
 type Credits struct {
 	gorm.Model
 
-	LastName   string `gorm:"type:varchar(100);not null" json:"last_name" form:"last_name"`
-	FirstName  string `gorm:"type:varchar(100);not null" json:"first_name" form:"first_name"`
-	MiddleName string `gorm:"type:varchar(100)" json:"middle_name" form:"middle_name"`
+	Name       string `json:"name" form:"name" gorm:"varchar(100)"`
+	Surname    string `json:"surname" form:"surname" gorm:"varchar(100)"`
+	Patronymic string `json:"patronymic" form:"patronymic" gorm:"varchar(100)"`
 
 	Phone      string `gorm:"type:varchar(20);not null" json:"phone" form:"phone"`
 	INN        string `gorm:"type:varchar(50)" json:"inn" form:"inn"`
