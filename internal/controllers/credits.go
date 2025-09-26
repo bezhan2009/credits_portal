@@ -73,12 +73,12 @@ func CreateCredit(c *gin.Context) {
 	frontPath := c.GetString(middlewares.FrontSideOfThePassportPath)
 	backPath := c.GetString(middlewares.BackSideOfThePassportPath)
 	selfiePath := c.GetString(middlewares.SelfieWithPassportPath)
+	incomeProofDocumentPath := c.GetString(middlewares.IncomeProofDocumentPath)
 
 	credit.FrontSideOfThePassport = frontPath
 	credit.BackSideOfThePassport = backPath
 	credit.SelfieWithPassport = selfiePath
-
-	credit.RequestCreator = "Мобильный банк"
+	credit.IncomeProofDocument = incomeProofDocumentPath
 
 	app, err := service.CreateCredit(&credit)
 	if err != nil {

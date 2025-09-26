@@ -4,4 +4,5 @@ const (
 	FrontSideOfThePassportPath = "FrontSideOfThePassportPath"
 	BackSideOfThePassportPath  = "BackSideOfThePassportPath"
 	SelfieWithPassportPath     = "SelfieWithPassportPath"
+	IncomeProofDocumentPath    = "IncomeProofDocumentPath"
 )

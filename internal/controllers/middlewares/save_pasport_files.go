@@ -17,6 +17,7 @@ func SavePassportFiles(c *gin.Context) {
 		"front_side_of_the_passport_file": FrontSideOfThePassportPath,
 		"back_side_of_the_passport_file":  BackSideOfThePassportPath,
 		"selfie_with_passport_file":       SelfieWithPassportPath,
+		"income_proof_document_file":      IncomeProofDocumentPath,
 	}
 
 	for formKey, contextKey := range files {
