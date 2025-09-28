@@ -11,6 +11,7 @@ func GetAllCredits(month, year int, afterID, statusID string) (credits []models.
 	query := db.GetDBConn().Model(&models.Credits{}).
 		Where("EXTRACT(MONTH FROM created_at) = ? AND EXTRACT(YEAR FROM created_at) = ?", month, year).
 		Where("credit_status_id = ?", statusID).
+		Preload("CreditsStatus").
 		Order("id ASC").
 		Limit(10)
 
@@ -32,7 +33,9 @@ func GetAllCredits(month, year int, afterID, statusID string) (credits []models.
 }
 
 func GetCreditById(creditID int) (credit models.Credits, err error) {
-	if err = db.GetDBConn().Model(&models.Credits{}).First(&credit, creditID).Error; err != nil {
+	if err = db.GetDBConn().Model(&models.Credits{}).
+		Preload("CreditsStatus").
+		First(&credit, creditID).Error; err != nil {
 		logger.Error.Printf("[repository.GetCreditsById] Error finding credits: %v", err)
 
 		return credit, TranslateGormError(err)
